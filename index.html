@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang='ru'>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+    <title>RexOnA</title>
+    
+</head>
+
+<body>
+    <!--  <img style="-webkit-user-select: none;margin: auto;background-color: hsl(0, 0%, 90%);transition: background-color 300ms;" src="https://thisartworkdoesnotexist.com/">
+	<br>
+	<a href ="/adminer-4.8.1-mysql.php">Adminer</a>
+	<hr> -->
+	<br>
+	<input id="InputModemID" type="text" name="modenID" placeholder="номер модема">
+     <button id="btn" class="btn">сменить IP</button>
+	 <br>
+    <div id="str">. </div>
+	<div id="str2">. </div>
+	<div id="str3">. </div>
+	<div id="str4">. </div>
+	<div id="str5">. </div>
+	<div id="str6">. </div>
+    <script>
+	var step1="";
+	var step2="";
+	maxtry=20;
+	val="";
+	var counter = 0;
+		asker = function() {
+			if (step1="gogogo" && counter<=maxtry){
+				console.log("asker counter:" + counter);
+				
+				document.getElementById('str4').innerHTML =document.getElementById('str4').innerHTML + ".";
+				var x = new XMLHttpRequest();
+				url = "http://10.70.10.13:3010?askid=" + val; 
+				document.getElementById('str2').innerHTML=url;
+				x.open("GET", url, true);
+				x.onload = function (){
+					document.getElementById('str2').innerHTML = url + " OK";
+					document.getElementById('str3').innerHTML = "resp: " + x.responseText;
+					console.log("улетел запрос");	
+					console.log(x.responseText);
+					if (x.responseText=="status=1"){
+						console.log("еще ждем");
+						setTimeout(asker,4000);
+					}
+					else if (x.responseText=="status=2"){
+						console.log("модем взят в работу");
+						document.getElementById('str5').innerHTML ="модем взят в работу";
+						setTimeout(asker,4000);
+					}
+					else if	(x.responseText=="status=3") {
+						step1="done";
+						console.log("set step1='done'");
+						counter = maxtry+1;
+						document.getElementById('str5').innerHTML ="готово";
+						//надо еще айпи узнать
+					}
+					else if (x.responseText=="status=4"){
+					console.log("модемчик выдал ошибку");
+					document.getElementById('str5').innerHTML ="модемчик выдал ошибку";
+					step1="err";
+					counter = maxtry+1;
+					}
+					else {
+					console.log("ошибка общения");
+					document.getElementById('str5').innerHTML ="ошибка общения";
+					step1="err";
+					counter = maxtry+1;
+					};
+					
+				};
+				x.send(null);     //send get
+
+			}	
+			else if (step1="gogogo" && counter > maxtry){
+				document.getElementById('str5').innerHTML ="время вышло, ошибка";
+				step1="end";
+				console.log("set step1='end'");
+			};
+			counter++;
+
+			
+		}; //asker end
+
+
+
+
+
+
+
+
+
+
+		btn.onclick = function() {
+			if (step1=="" || step1 == "end"){
+				document.getElementById('str5').innerHTML =".";
+				console.log("step1=" + step1);
+				val = document.getElementById('InputModemID').value;
+				
+				document.getElementById('str').innerHTML="Меняем IP на модеме № "+val;
+				var x = new XMLHttpRequest();
+				url = "http://10.70.10.13:3010?id=" + val; 
+				document.getElementById('str2').innerHTML=url;
+				x.open("GET", url, true);
+				x.onload = function (){
+					console.log("resp: " + x.responseText);
+					document.getElementById('str3').innerHTML = "resp: " + x.responseText;
+					if (x.responseText=="id="+val){
+						document.getElementById('str3').innerHTML = "resp: " + x.responseText + " OK";
+						step1='gogogo';
+						console.log("step1 set " + step1);	
+						//PREP TO RUN ASKER
+						counter = 0;
+						document.getElementById('str4').innerHTML ="..";
+						console.log(step1);
+						setTimeout(asker,4000);
+					}
+					else {
+					console.log("wtf");
+					};
+					
+				}
+				//console.log("2x step1=" + step1);
+				x.send(null);     //send get
+				console.log("улетел запрос");
+			}
+			else {
+				console.log("предыдущий процес не вернул ответ");
+				document.getElementById('str5').innerHTML ="жду ответа от модема";
+			};
+		}; //btn.onclick = function() {
+	console.log("end");
+    </script>
+
+</body>
+
+</html>
